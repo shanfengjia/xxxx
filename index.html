@@ -2,338 +2,185 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<title>烟雨西湖水墨绘</title>
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>烟雨西湖水墨绘 | 首页</title>
 <style>
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:"STSong","宋体";
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "STSong", "宋体", serif;
 }
-body{
-height:100vh;
-background:linear-gradient(#edf6f4,#dce9e5);
-overflow:hidden;
+
+body {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  /* 匹配画板西湖渐变底色，风格统一 */
+  background: linear-gradient(#edf6f4,#dce9e5);
+  color: #3f4b47;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
 }
-.container{
-display:grid;
-grid-template-columns:140px 1fr 170px;
-grid-template-rows:60px 1fr 55px;
-height:100vh;
+
+/* 宣纸纹理底纹，替换失效外链，本地生效 */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-color: rgba(250, 248, 242, 0.35);
+  pointer-events: none;
+  z-index: 1;
 }
-.header{
-grid-column:1/4;
-background:rgba(255,255,255,.55);
-border-bottom:1px solid #999;
-display:flex;
-align-items:center;
-justify-content:space-between;
-padding:0 30px;
-backdrop-filter:blur(8px);
+
+/* 水墨浮动粒子背景 */
+.ink-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
 }
-.title{
-font-size:30px;
-color:#3f4b47;
-font-weight:bold;
-letter-spacing:4px;
+
+/* 首页主体内容 */
+.home-box {
+  position: relative;
+  z-index: 3;
+  text-align: center;
+  animation: float 6s ease-in-out infinite;
 }
-.topButton{
-display:flex;
-gap:12px;
+
+@keyframes float {
+  0%,100% { transform: translateY(0); opacity: 0.9; }
+  50% { transform: translateY(-8px); opacity: 1; }
 }
-.topButton button{
-padding:10px 20px;
-border:none;
-border-radius:10px;
-background:#7b8f89;
-color:white;
-cursor:pointer;
-font-size:15px;
+
+.home-title {
+  font-size: 62px;
+  letter-spacing: 12px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: #3f4b47;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
-.topButton button:hover{
-background:#5d726c;
+
+.home-desc {
+  font-size: 20px;
+  letter-spacing: 4px;
+  color: #60706b;
+  margin-bottom: 50px;
 }
-.left{
-background:rgba(255,255,255,.45);
-border-right:1px solid #aaa;
-display:flex;
-flex-direction:column;
-align-items:center;
-padding-top:20px;
-gap:18px;
+
+/* 国风主按钮 */
+.start-btn {
+  padding: 16px 52px;
+  font-size: 18px;
+  letter-spacing: 4px;
+  background: #6d817b;
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(109, 129, 123, 0.25);
 }
-.tool{
-width:95px;
-height:42px;
-border-radius:30px;
-border:none;
-background:#6e807a;
-color:white;
-cursor:pointer;
+
+.start-btn:hover {
+  background: #4f6a63;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(109, 129, 123, 0.35);
 }
-.tool.active{
-background:#4f6a63;
-box-shadow:inset 0 0 6px rgba(0,0,0,0.3);
+
+/* 底部落款 */
+.footer-text {
+  position: absolute;
+  bottom: 30px;
+  font-size: 14px;
+  color: #7b8f89;
+  letter-spacing: 2px;
+  z-index: 3;
 }
-.tool:hover{
-background:#546661;
-}
-.slider{
-width:90px;
-}
-.colorBox{
-display:grid;
-grid-template-columns:repeat(3,30px);
-gap:10px;
-}
-.color{
-width:30px;
-height:30px;
-border-radius:50%;
-cursor:pointer;
-border:2px solid white;
-transition:0.2s;
-}
-.color:hover{
-transform:scale(1.1);
-}
-.customColor{
-width:95px;
-height:34px;
-border:none;
-border-radius:6px;
-cursor:pointer;
-}
-.center{
-display:flex;
-justify-content:center;
-align-items:center;
-background:url('https://www.transparenttextures.com/patterns/rice-paper.png');
-}
-.paper{
-background:#faf8f2;
-padding:20px;
-box-shadow:0 0 25px rgba(0,0,0,.25);
-border-radius:8px;
-}
-canvas{
-background:#fbfaf5;
-cursor:crosshair;
-}
-.right{
-background:rgba(255,255,255,.45);
-border-left:1px solid #aaa;
-padding:15px;
-overflow:auto;
-}
-.right h3{
-text-align:center;
-margin-bottom:15px;
-}
-.sticker{
-height:90px;
-background:#fff;
-border:1px solid #bbb;
-margin-bottom:12px;
-border-radius:8px;
-display:flex;
-align-items:center;
-justify-content:center;
-cursor:pointer;
-transition:.3s;
-}
-.sticker:hover{
-transform:scale(1.04);
-}
-.footer{
-grid-column:1/4;
-background:rgba(255,255,255,.55);
-border-top:1px solid #999;
-display:flex;
-justify-content:center;
-align-items:center;
-gap:18px;
-}
-.footer button{
-padding:12px 24px;
-border:none;
-border-radius:10px;
-cursor:pointer;
-background:#6d817b;
-color:white;
-font-size:15px;
-}
-.export{
-font-size:18px!important;
-background:#4f6a63!important;
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+  .home-title {
+    font-size: 38px;
+    letter-spacing: 6px;
+  }
+  .home-desc {
+    font-size: 16px;
+  }
+  .start-btn {
+    padding: 14px 40px;
+    font-size: 16px;
+  }
 }
 </style>
 </head>
 <body>
-<div class="container">
-<div class="header">
-<div class="title">
-烟雨西湖水墨绘
+<canvas class="ink-bg" id="bgCanvas"></canvas>
+
+<div class="home-box">
+  <h1 class="home-title">烟雨西湖水墨绘</h1>
+  <p class="home-desc">一笔落烟雨，水墨绘西湖</p>
+  <button class="start-btn" onclick="location.href='draw.html'">进入画板创作</button>
 </div>
-<div class="topButton">
-<button onclick="alert('页面2：西湖底纹弹窗')">
-切换底纹
-</button>
-<button onclick="alert('页面3：素材弹窗')">
-贴纸素材
-</button>
-</div>
-</div>
-<div class="left">
-<button class="tool active" id="brushBtn">
-水墨画笔
-</button>
-<button class="tool" id="eraserBtn">
-橡皮擦
-</button>
-<input class="slider"
-type="range"
-min="2"
-max="30"
-value="5"
-id="size">
-<div class="colorBox">
-<div class="color" style="background:#111" onclick="changeColor('#111')"></div>
-<div class="color" style="background:#666" onclick="changeColor('#666')"></div>
-<div class="color" style="background:#7f5539" onclick="changeColor('#7f5539')"></div>
-<div class="color" style="background:#55738d" onclick="changeColor('#55738d')"></div>
-<div class="color" style="background:#3b705c" onclick="changeColor('#3b705c')"></div>
-<div class="color" style="background:#a86464" onclick="changeColor('#a86464')"></div>
-</div>
-<input type="color" class="customColor" id="customColorInput" value="#111">
-<button class="tool" onclick="clearCanvas()">
-清空
-</button>
-</div>
-<div class="center">
-<div class="paper">
-<canvas id="canvas" width="980" height="620"></canvas>
-</div>
-</div>
-<div class="right">
-<h3>西湖贴纸素材库</h3>
-<div class="sticker">拱桥</div>
-<div class="sticker">荷花</div>
-<div class="sticker">游船</div>
-<div class="sticker">亭台</div>
-<div class="sticker">垂柳</div>
-</div>
-<div class="footer">
-<button onclick="undo()">撤销</button>
-<button class="export" onclick="alert('页面4：导出窗口')">导出作品</button>
-<button onclick="redo()">恢复</button>
-</div>
-</div>
+
+<div class="footer-text">国风手绘 · 西湖水墨专属画板</div>
+
 <script>
-const canvas=document.getElementById("canvas");
-const ctx=canvas.getContext("2d");
-const brushBtn=document.getElementById("brushBtn");
-const eraserBtn=document.getElementById("eraserBtn");
-const customColorInput=document.getElementById("customColorInput");
-let drawing=false;
-let color="#111";
-let size=5;
-let isEraser=false;
-let history=[];
-let step=-1;
+// 水墨云雾动态背景
+const bgCanvas = document.getElementById("bgCanvas");
+const bgCtx = bgCanvas.getContext("2d");
+let w, h;
 
-document.getElementById("size").oninput=function(){
-size=this.value;
+function resize() {
+  w = bgCanvas.width = window.innerWidth;
+  h = bgCanvas.height = window.innerHeight;
 }
+resize();
+window.addEventListener("resize", resize);
 
-customColorInput.oninput=function(){
-color=this.value;
-isEraser=false;
-switchTool(false);
-}
-
-function changeColor(c){
-color=c;
-customColorInput.value=c;
-isEraser=false;
-switchTool(false);
-}
-
-function switchTool(eraserMode){
-isEraser=eraserMode;
-if(eraserMode){
-brushBtn.classList.remove("active");
-eraserBtn.classList.add("active");
-}else{
-brushBtn.classList.add("active");
-eraserBtn.classList.remove("active");
-}
+// 水墨粒子效果
+class InkParticle {
+  constructor(){
+    this.x = Math.random() * w;
+    this.y = Math.random() * h;
+    this.r = Math.random() * 80 + 40;
+    this.a = Math.random() * 0.03 + 0.008;
+    this.speedX = (Math.random() - 0.5) * 0.12;
+    this.speedY = (Math.random() - 0.5) * 0.12;
+  }
+  update(){
+    this.x += this.speedX;
+    this.y += this.speedY;
+    if(this.x > w + 100) this.x = -100;
+    if(this.x < -100) this.x = w + 100;
+    if(this.y > h + 100) this.y = -100;
+    if(this.y < -100) this.y = h + 100;
+  }
+  draw(){
+    bgCtx.beginPath();
+    bgCtx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+    bgCtx.fillStyle = `rgba(180, 195, 190, ${this.a})`;
+    bgCtx.fill();
+  }
 }
 
-brushBtn.onclick=()=>switchTool(false);
-eraserBtn.onclick=()=>switchTool(true);
+let particles = [];
+for(let i = 0; i < 15; i++) particles.push(new InkParticle());
 
-canvas.onmousedown=function(e){
-drawing=true;
-ctx.beginPath();
-ctx.moveTo(e.offsetX,e.offsetY);
-save();
+function animate() {
+  bgCtx.clearRect(0, 0, w, h);
+  particles.forEach(item => {
+    item.update();
+    item.draw();
+  })
+  requestAnimationFrame(animate);
 }
-
-canvas.onmousemove=function(e){
-if(!drawing)return;
-ctx.lineWidth=size;
-ctx.lineCap="round";
-ctx.lineJoin="round";
-if(isEraser){
-ctx.globalCompositeOperation="destination-out";
-ctx.strokeStyle="rgba(255,255,255,1)";
-}else{
-ctx.globalCompositeOperation="source-over";
-ctx.strokeStyle=color;
-}
-ctx.lineTo(e.offsetX,e.offsetY);
-ctx.stroke();
-}
-
-window.onmouseup=function(){
-drawing=false;
-}
-
-function save(){
-step++;
-history.length=step;
-history.push(canvas.toDataURL());
-}
-
-function undo(){
-if(step<=0)return;
-step--;
-let img=new Image();
-img.src=history[step];
-img.onload=()=>{
-ctx.clearRect(0,0,canvas.width,canvas.height);
-ctx.drawImage(img,0,0);
-}
-}
-
-function redo(){
-if(step>=history.length-1)return;
-step++;
-let img=new Image();
-img.src=history[step];
-img.onload=()=>{
-ctx.clearRect(0,0,canvas.width,canvas.height);
-ctx.drawImage(img,0,0);
-}
-}
-
-function clearCanvas(){
-ctx.clearRect(0,0,canvas.width,canvas.height);
-save();
-}
-save();
+animate();
 </script>
 </body>
 </html>
