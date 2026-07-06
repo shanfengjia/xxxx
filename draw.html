@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>烟雨西湖水墨绘 - 创作画板</title>
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:"STSong","宋体";
+}
+body{
+height:100vh;
+/* 修复：替换失效外链宣纸底纹，本地纯色纹理替代，永不失效 */
+background:linear-gradient(#edf6f4,#dce9e5);
+overflow:hidden;
+}
+.container{
+display:grid;
+grid-template-columns:140px 1fr 170px;
+grid-template-rows:60px 1fr 55px;
+height:100vh;
+}
+.header{
+grid-column:1/4;
+background:rgba(255,255,255,.55);
+border-bottom:1px solid #999;
+display:flex;
+align-items:center;
+justify-content:space-between;
+padding:0 30px;
+backdrop-filter:blur(8px);
+z-index:10;
+}
+.title{
+font-size:30px;
+color:#3f4b47;
+font-weight:bold;
+letter-spacing:4px;
+}
+.topButton{
+display:flex;
+gap:12px;
+}
+.topButton button{
+padding:10px 20px;
+border:none;
+border-radius:10px;
+background:#7b8f89;
+color:white;
+cursor:pointer;
+font-size:15px;
+transition:0.3s ease;
+}
+.topButton button:hover{
+background:#5d726c;
+transform: translateY(-2px);
+}
+/* 新增返回首页按钮样式 */
+.backHome{
+background:#4f6a63!important;
+}
+.backHome:hover{
+background:#3d534d!important;
+}
+
+.left{
+background:rgba(255,255,255,.45);
+border-right:1px solid #aaa;
+display:flex;
+flex-direction:column;
+align-items:center;
+padding-top:20px;
+gap:18px;
+}
+.tool{
+width:95px;
+height:42px;
+border-radius:30px;
+border:none;
+background:#6e807a;
+color:white;
+cursor:pointer;
+transition:0.3s ease;
+}
+.tool.active{
+background:#4f6a63;
+box-shadow:inset 0 0 6px rgba(0,0,0,0.3);
+}
+.tool:hover{
+background:#546661;
+}
+.slider{
+width:90px;
+cursor:pointer;
+}
+.colorBox{
+display:grid;
+grid-template-columns:repeat(3,30px);
+gap:10px;
+}
+.color{
+width:30px;
+height:30px;
+border-radius:50%;
+cursor:pointer;
+border:2px solid white;
+transition:0.2s;
+box-shadow:0 2px 6px rgba(0,0,0,0.1);
+}
+.color:hover{
+transform:scale(1.1);
+}
+.color.active{
+transform:scale(1.15);
+box-shadow:0 0 0 2px #4f6a63;
+}
+.customColor{
+width:95px;
+height:34px;
+border:none;
+border-radius:6px;
+cursor:pointer;
+border:1px solid #ccc;
+}
+.center{
+display:flex;
+justify-content:center;
+align-items:center;
+/* 修复底纹失效问题 */
+background-color:#f5f3ec;
+}
+.paper{
+background:#faf8f2;
+padding:20px;
+box-shadow:0 0 25px rgba(0,0,0,.25);
+border-radius:8px;
+}
+canvas{
+background:#fbfaf5;
+cursor:crosshair;
+border-radius:4px;
+}
+.right{
+background:rgba(255,255,255,.45);
+border-left:1px solid #aaa;
+padding:15px;
+overflow:auto;
+}
+.right h3{
+text-align:center;
+margin-bottom:15px;
+color:#3f4b47;
+letter-spacing:2px;
+}
+.sticker{
+height:90px;
+background:#fff;
+border:1px solid #bbb;
+margin-bottom:12px;
+border-radius:8px;
+display:flex;
+align-items:center;
+justify-content:center;
+cursor:pointer;
+transition:.3s;
+color:#3f4b47;
+font-size:15px;
+}
+.sticker:hover{
+transform:scale(1.04);
+box-shadow:0 4px 12px rgba(0,0,0,0.1);
+}
+.footer{
+grid-column:1/4;
+background:rgba(255,255,255,.55);
+border-top:1px solid #999;
+display:flex;
+justify-content:center;
+align-items:center;
+gap:18px;
+}
+.footer button{
+padding:12px 24px;
+border:none;
+border-radius:10px;
+cursor:pointer;
+background:#6d817b;
+color:white;
+font-size:15px;
+transition:0.3s ease;
+}
+.footer button:hover{
+background:#5d726c;
+transform: translateY(-2px);
+}
+.export{
+font-size:18px!important;
+background:#4f6a63!important;
+}
+.export:hover{
+background:#3d534d!important;
+}
+
+/* 弹窗美化 */
+.modal{
+position: fixed;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background: rgba(0,0,0,0.4);
+display: none;
+align-items: center;
+justify-content: center;
+z-index: 99;
+}
+.modal-box{
+background: #faf8f2;
+padding: 30px;
+border-radius: 12px;
+box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+text-align: center;
+}
+.modal-box h4{
+margin-bottom: 20px;
+color: #3f4b47;
+font-size: 18px;
+}
+.modal-box button{
+padding: 8px 20px;
+border: none;
+border-radius: 8px;
+background: #6d817b;
+color: #fff;
+cursor: pointer;
+}
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header">
+<div class="title">
+烟雨西湖水墨绘
+</div>
+<div class="topButton">
+<button class="backHome" onclick="location.href='index.html'">返回首页</button>
+<button onclick="openModal('底纹切换功能开发中，默认启用西湖宣纸底纹')">切换底纹</button>
+<button onclick="openModal('西湖贴纸素材：拱桥、荷花、游船、亭台、垂柳')">贴纸素材</button>
+</div>
+</div>
+<div class="left">
+<button class="tool active" id="brushBtn">
+水墨画笔
+</button>
+<button class="tool" id="eraserBtn">
+橡皮擦
+</button>
+<input class="slider"
+type="range"
+min="2"
+max="30"
+value="5"
+id="size">
+<div class="colorBox">
+<div class="color active" style="background:#111" onclick="changeColor('#111',this)"></div>
+<div class="color" style="background:#666" onclick="changeColor('#666',this)"></div>
+<div class="color" style="background:#7f5539" onclick="changeColor('#7f5539',this)"></div>
+<div class="color" style="background:#55738d" onclick="changeColor('#55738d',this)"></div>
+<div class="color" style="background:#3b705c" onclick="changeColor('#3b705c',this)"></div>
+<div class="color" style="background:#a86464" onclick="changeColor('#a86464',this)"></div>
+</div>
+<input type="color" class="customColor" id="customColorInput" value="#111">
+<button class="tool" onclick="clearCanvas()">
+清空画布
+</button>
+</div>
+<div class="center">
+<div class="paper">
+<canvas id="canvas" width="980" height="620"></canvas>
+</div>
+</div>
+<div class="right">
+<h3>西湖贴纸素材库</h3>
+<div class="sticker" onclick="openModal('已选中：拱桥素材，可手绘搭配创作')">拱桥</div>
+<div class="sticker" onclick="openModal('已选中：荷花素材，可手绘搭配创作')">荷花</div>
+<div class="sticker" onclick="openModal('已选中：游船素材，可手绘搭配创作')">游船</div>
+<div class="sticker" onclick="openModal('已选中：亭台素材，可手绘搭配创作')">亭台</div>
+<div class="sticker" onclick="openModal('已选中：垂柳素材，可手绘搭配创作')">垂柳</div>
+</div>
+<div class="footer">
+<button onclick="undo()">撤销</button>
+<button class="export" onclick="exportImg()">导出作品</button>
+<button onclick="redo()">恢复</button>
+</div>
+</div>
+
+<!-- 自定义弹窗 -->
+<div class="modal" id="modal">
+<div class="modal-box">
+<h4 id="modalText"></h4>
+<button onclick="closeModal()">确定</button>
+</div>
+</div>
+
+<script>
+const canvas=document.getElementById("canvas");
+const ctx=canvas.getContext("2d");
+const brushBtn=document.getElementById("brushBtn");
+const eraserBtn=document.getElementById("eraserBtn");
+const customColorInput=document.getElementById("customColorInput");
+const colorItems = document.querySelectorAll('.color');
+
+let drawing=false;
+let color="#111";
+let size=5;
+let isEraser=false;
+let history=[];
+let step=-1;
+
+// 笔触大小调节
+document.getElementById("size").oninput=function(){
+size=this.value;
+}
+
+// 自定义取色
+customColorInput.oninput=function(){
+color=this.value;
+isEraser=false;
+switchTool(false);
+clearColorActive();
+}
+
+// 切换颜色+激活选中状态
+function changeColor(c,el){
+color=c;
+customColorInput.value=c;
+isEraser=false;
+switchTool(false);
+clearColorActive();
+el.classList.add('active');
+}
+
+// 清除颜色选中状态
+function clearColorActive(){
+colorItems.forEach(item=>item.classList.remove('active'));
+}
+
+// 工具切换优化
+function switchTool(eraserMode){
+isEraser=eraserMode;
+if(eraserMode){
+brushBtn.classList.remove("active");
+eraserBtn.classList.add("active");
+}else{
+brushBtn.classList.add("active");
+eraserBtn.classList.remove("active");
+}
+}
+
+brushBtn.onclick=()=>switchTool(false);
+eraserBtn.onclick=()=>switchTool(true);
+
+// 鼠标绘制优化（修复线条卡顿、优化水墨晕染）
+canvas.onmousedown=function(e){
+drawing=true;
+ctx.beginPath();
+ctx.moveTo(e.offsetX,e.offsetY);
+save();
+// 水墨质感优化
+ctx.lineCap = "round";
+ctx.lineJoin = "round";
+}
+
+canvas.onmousemove=function(e){
+if(!drawing)return;
+ctx.lineWidth=size;
+
+if(isEraser){
+// 修复橡皮擦残留BUG
+ctx.globalCompositeOperation="destination-out";
+ctx.strokeStyle="rgba(255,255,255,1)";
+ctx.lineWidth = size * 1.5;
+}else{
+ctx.globalCompositeOperation="source-over";
+ctx.strokeStyle=color;
+// 水墨淡晕效果
+ctx.globalAlpha = 0.9;
+}
+ctx.lineTo(e.offsetX,e.offsetY);
+ctx.stroke();
+}
+
+window.onmouseup=function(){
+drawing=false;
+ctx.globalAlpha = 1;
+}
+
+// 历史记录保存优化
+function save(){
+step++;
+history.length=step;
+history.push(canvas.toDataURL());
+// 限制历史记录数量，防止卡顿
+if(history.length > 50){
+history.shift();
+step--;
+}
+}
+
+// 撤销功能优化
+function undo(){
+if(step<=0)return;
+step--;
+let img=new Image();
+img.src=history[step];
+img.onload=()=>{
+ctx.clearRect(0,0,canvas.width,canvas.height);
+ctx.drawImage(img,0,0);
+}
+}
+
+// 恢复功能优化
+function redo(){
+if(step>=history.length-1)return;
+step++;
+let img=new Image();
+img.src=history[step];
+img.onload=()=>{
+ctx.clearRect(0,0,canvas.width,canvas.height);
+ctx.drawImage(img,0,0);
+}
+}
+
+// 清空画布
+function clearCanvas(){
+ctx.clearRect(0,0,canvas.width,canvas.height);
+save();
+}
+
+// 真正导出图片功能（替换弹窗）
+function exportImg(){
+let link = document.createElement('a');
+link.download = '烟雨西湖水墨作品.png';
+link.href = canvas.toDataURL('image/png');
+link.click();
+}
+
+// 自定义弹窗方法
+function openModal(text){
+document.getElementById('modalText').innerText = text;
+document.getElementById('modal').style.display = 'flex';
+}
+function closeModal(){
+document.getElementById('modal').style.display = 'none';
+}
+
+// 初始化保存画布
+save();
+</script>
+</body>
+</html>
