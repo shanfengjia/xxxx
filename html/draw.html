@@ -1,0 +1,1125 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>烟雨西湖水墨绘 - 创作画板</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&display=swap');
+:root{
+    --ink:#344741;
+    --ink-deep:#263934;
+    --ink-soft:#6f817a;
+    --paper:#fbfaf4;
+    --paper-deep:#f1eee4;
+    --mist:rgba(255,255,255,.58);
+    --line:rgba(77,101,94,.22);
+    --shadow:0 14px 40px rgba(53,75,68,.13);
+}
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:"Noto Serif SC","STSong","Songti SC","SimSun",serif;
+}
+html,body{
+    width:100%;
+    height:100%;
+}
+body{
+    height:100vh;
+    overflow:hidden;
+    position:relative;
+    color:var(--ink);
+    background:
+        radial-gradient(circle at 50% 0%,rgba(255,255,255,.82),transparent 42%),
+        linear-gradient(135deg,#edf4f1 0%,#e2ece8 48%,#d5e2de 100%);
+}
+/* 底层底纹容器 */
+#bgTexture{
+    position:fixed;
+    inset:0;
+    z-index:-2;
+    background-size:cover;
+    background-position:center;
+    transition: background-image 0.5s ease;
+}
+body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    z-index:-1;
+    pointer-events:none;
+    opacity:.45;
+    background:
+        repeating-linear-gradient(0deg,rgba(55,76,69,.025) 0,rgba(55,76,69,.025) 1px,transparent 1px,transparent 5px),
+        repeating-linear-gradient(90deg,rgba(255,255,255,.18) 0,rgba(255,255,255,.18) 1px,transparent 1px,transparent 8px);
+}
+body::after{
+    content:"";
+    position:fixed;
+    width:520px;
+    height:520px;
+    left:-220px;
+    bottom:-260px;
+    border-radius:50%;
+    background:rgba(91,116,107,.09);
+    filter:blur(20px);
+    pointer-events:none;
+}
+.container{
+    display:grid;
+    grid-template-columns:168px minmax(0,1fr) 218px;
+    grid-template-rows:72px minmax(0,1fr) 68px;
+    width:100%;
+    height:100vh;
+    position:relative;
+    z-index:1;
+}
+.header{
+    grid-column:1/4;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 28px;
+    background:rgba(250,252,249,.66);
+    border-bottom:1px solid var(--line);
+    box-shadow:0 3px 20px rgba(57,78,71,.06);
+    backdrop-filter:blur(18px);
+    z-index:10;
+}
+.brand{
+    display:flex;
+    align-items:center;
+    gap:15px;
+}
+.brand-mark{
+    width:38px;
+    height:38px;
+    border:1px solid rgba(67,91,84,.32);
+    border-radius:50%;
+    display:grid;
+    place-items:center;
+    color:var(--ink);
+    font-size:18px;
+    background:rgba(255,255,255,.35);
+    box-shadow:inset 0 0 0 5px rgba(255,255,255,.18);
+}
+.title{
+    color:var(--ink-deep);
+    font-size:25px;
+    font-weight:600;
+    letter-spacing:7px;
+    text-shadow:0 1px 5px rgba(54,76,69,.09);
+}
+.title-sub{
+    margin-top:2px;
+    color:#82918c;
+    font-size:10px;
+    letter-spacing:4px;
+}
+.topButton{
+    display:flex;
+    gap:9px;
+}
+.topButton button, .footer button{
+    border:1px solid rgba(77,101,94,.22);
+    border-radius:4px;
+    padding:9px 16px;
+    background:rgba(255,255,255,.42);
+    color:#52655e;
+    cursor:pointer;
+    font-size:13px;
+    letter-spacing:2px;
+    transition:.28s ease;
+    box-shadow:0 3px 10px rgba(50,70,64,.05);
+}
+.topButton button:hover, .footer button:hover{
+    transform:translateY(-2px);
+    color:#fff;
+    background:#5b7068;
+    border-color:#5b7068;
+    box-shadow:0 8px 20px rgba(58,82,74,.16);
+}
+.topButton .backHome{
+    color:#fff;
+    background:#4c635b;
+    border-color:#4c635b;
+}
+.topButton .backHome:hover{
+    background:#334b43;
+    border-color:#334b43;
+}
+.left{
+    position:relative;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:23px 18px;
+    gap:12px;
+    background:rgba(248,251,248,.48);
+    border-right:1px solid var(--line);
+    backdrop-filter:blur(16px);
+}
+.panel-caption{
+    width:100%;
+    margin:0 0 5px;
+    color:#83918c;
+    text-align:center;
+    font-size:10px;
+    letter-spacing:4px;
+}
+.panel-caption::after{
+    content:"";
+    display:block;
+    width:34px;
+    height:1px;
+    margin:10px auto 2px;
+    background:rgba(75,99,92,.28);
+}
+.tool{
+    width:126px;
+    height:43px;
+    border:1px solid rgba(77,101,94,.18);
+    border-radius:5px;
+    background:rgba(255,255,255,.48);
+    color:#60736c;
+    cursor:pointer;
+    font-size:13px;
+    letter-spacing:3px;
+    transition:.28s ease;
+    box-shadow:0 4px 12px rgba(55,77,70,.05);
+}
+.tool:hover{
+    transform:translateY(-2px);
+    background:rgba(255,255,255,.72);
+    box-shadow:0 8px 18px rgba(55,77,70,.09);
+}
+.tool.active{
+    color:#fff;
+    background:linear-gradient(135deg,#516a62,#3e564e);
+    border-color:#4a625a;
+    box-shadow:0 8px 18px rgba(56,79,71,.18);
+}
+.size-group{
+    width:126px;
+    padding:12px 10px 9px;
+    margin:3px 0;
+    border-top:1px solid rgba(77,101,94,.13);
+    border-bottom:1px solid rgba(77,101,94,.13);
+}
+.size-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:9px;
+    color:#73847e;
+    font-size:11px;
+    letter-spacing:2px;
+}
+#sizeValue{
+    color:#435850;
+    font-family:Georgia,serif;
+}
+.slider{
+    width:100%;
+    height:4px;
+    appearance:none;
+    border-radius:10px;
+    outline:none;
+    background:linear-gradient(to right,#546d65 0%,#aab9b4 100%);
+    cursor:pointer;
+}
+.slider::-webkit-slider-thumb{
+    appearance:none;
+    width:13px;
+    height:13px;
+    border-radius:50%;
+    background:#f8f6ef;
+    border:2px solid #50675f;
+    box-shadow:0 2px 5px rgba(45,65,59,.18);
+}
+.slider::-moz-range-thumb{
+    width:13px;
+    height:13px;
+    border-radius:50%;
+    background:#f8f6ef;
+    border:2px solid #50675f;
+}
+.color-title{
+    color:#7c8c87;
+    font-size:10px;
+    letter-spacing:3px;
+    margin:1px 0 2px;
+}
+.colorBox{
+    display:grid;
+    grid-template-columns:repeat(3,27px);
+    gap:9px;
+}
+.color{
+    width:27px;
+    height:27px;
+    border-radius:50%;
+    cursor:pointer;
+    border:2px solid rgba(255,255,255,.9);
+    box-shadow:0 3px 8px rgba(39,56,51,.13);
+    transition:.22s ease;
+}
+.color:hover{
+    transform:scale(1.12);
+}
+.color.active{
+    transform:scale(1.13);
+    box-shadow:0 0 0 2px #536b63,0 4px 9px rgba(39,56,51,.16);
+}
+.customColor{
+    width:126px;
+    height:34px;
+    padding:3px;
+    border:1px solid rgba(77,101,94,.22);
+    border-radius:5px;
+    background:rgba(255,255,255,.52);
+    cursor:pointer;
+}
+.center{
+    min-width:0;
+    min-height:0;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    position:relative;
+    padding:24px;
+    overflow:hidden;
+    background:
+        radial-gradient(ellipse at center,rgba(255,255,255,.33),transparent 68%);
+}
+.center::before{
+    content:"";
+    position:absolute;
+    width:72%;
+    height:72%;
+    border-radius:50%;
+    background:rgba(255,255,255,.18);
+    filter:blur(60px);
+    pointer-events:none;
+}
+.canvas-label{
+    position:absolute;
+    top:16px;
+    left:50%;
+    transform:translateX(-50%);
+    display:flex;
+    align-items:center;
+    gap:11px;
+    color:#86938f;
+    font-size:10px;
+    letter-spacing:4px;
+    opacity:.85;
+}
+.canvas-label span{
+    width:26px;
+    height:1px;
+    background:rgba(79,103,95,.3);
+}
+.paper{
+    position:relative;
+    z-index:2;
+    padding:13px;
+    background:
+        linear-gradient(rgba(255,255,255,.28),rgba(255,255,255,.28)),
+        #f8f6ee;
+    border:1px solid rgba(151,154,143,.4);
+    border-radius:3px;
+    box-shadow:
+        0 25px 55px rgba(48,69,62,.16),
+        0 4px 12px rgba(48,69,62,.08);
+}
+.paper::before, .paper::after{
+    content:"";
+    position:absolute;
+    pointer-events:none;
+    border:1px solid rgba(92,111,103,.14);
+}
+.paper::before{
+    inset:6px;
+}
+.paper::after{
+    inset:9px;
+    border-color:rgba(255,255,255,.58);
+}
+canvas{
+    position:relative;
+    z-index:2;
+    display:block;
+    max-width:100%;
+    height:auto;
+    background: transparent;
+    cursor:crosshair;
+    box-shadow:inset 0 0 28px rgba(91,85,67,.035);
+}
+.right{
+    position:relative;
+    padding:21px 18px;
+    overflow:auto;
+    background:rgba(248,251,248,.48);
+    border-left:1px solid var(--line);
+    backdrop-filter:blur(16px);
+}
+.right h3{
+    color:#465a53;
+    text-align:center;
+    margin-bottom:5px;
+    font-size:14px;
+    font-weight:600;
+    letter-spacing:3px;
+}
+.right h3::after{
+    content:"";
+    display:block;
+    width:38px;
+    height:1px;
+    margin:11px auto 18px;
+    background:rgba(76,100,92,.3);
+}
+.sticker{
+    position:relative;
+    height:82px;
+    margin-bottom:12px;
+    padding:12px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:5px;
+    border:1px solid rgba(129,133,122,.27);
+    border-radius:5px;
+    background:
+        linear-gradient(135deg,rgba(255,255,255,.7),rgba(247,244,235,.62));
+    color:#52665f;
+    cursor:pointer;
+    font-size:14px;
+    letter-spacing:3px;
+    transition:.3s ease;
+    box-shadow:0 4px 13px rgba(52,73,67,.045);
+    overflow:hidden;
+}
+.sticker::before{
+    content:"";
+    width:25px;
+    height:1px;
+    background:rgba(82,103,96,.22);
+    transition:.3s ease;
+}
+.sticker::after{
+    content:"水墨素材";
+    position:absolute;
+    right:9px;
+    bottom:6px;
+    color:rgba(93,108,101,.34);
+    font-size:7px;
+    letter-spacing:1px;
+}
+.sticker:hover{
+    transform:translateY(-3px);
+    border-color:rgba(73,98,90,.36);
+    background:#faf8f0;
+    box-shadow:0 10px 24px rgba(54,77,69,.12);
+}
+.sticker:hover::before{
+    width:42px;
+    background:#627a71;
+}
+.footer{
+    grid-column:1/4;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:10px;
+    background:rgba(250,252,249,.68);
+    border-top:1px solid var(--line);
+    backdrop-filter:blur(18px);
+    box-shadow:0 -3px 18px rgba(57,78,71,.04);
+}
+.footer button{
+    min-width:82px;
+}
+.footer .export{
+    min-width:132px;
+    color:#fff;
+    background:#4b625a;
+    border-color:#4b625a;
+    font-size:14px;
+}
+.footer .export:hover{
+    background:#334b43;
+    border-color:#334b43;
+}
+.modal{
+    position:fixed;
+    inset:0;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:99;
+    background:rgba(38,53,48,.28);
+    backdrop-filter:blur(8px);
+}
+.modal-box{
+    position:relative;
+    min-width:330px;
+    max-width:calc(100vw - 40px);
+    padding:34px 38px 28px;
+    text-align:center;
+    border:1px solid rgba(111,119,107,.25);
+    border-radius:5px;
+    background:rgba(250,248,240,.94);
+    box-shadow:0 25px 65px rgba(38,56,50,.2);
+}
+.modal-box::before{
+    content:"";
+    position:absolute;
+    top:13px;
+    left:50%;
+    width:36px;
+    height:1px;
+    transform:translateX(-50%);
+    background:rgba(76,99,92,.3);
+}
+.modal-box h4{
+    margin-bottom:23px;
+    color:#445850;
+    font-size:15px;
+    font-weight:500;
+    line-height:1.9;
+    letter-spacing:2px;
+}
+.modal-box button{
+    padding:9px 28px;
+    border:1px solid #526a61;
+    border-radius:3px;
+    background:#526a61;
+    color:#fff;
+    cursor:pointer;
+    font-size:13px;
+    letter-spacing:3px;
+    transition:.25s;
+}
+.modal-box button:hover{
+    background:#344d45;
+    border-color:#344d45;
+}
+
+/* 青色水墨卷轴面板样式 */
+.scroll-wrapper {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 0vw; 
+    height: 88vh;
+    max-width: 1350px;
+    background-color: #f3f7f4;
+    transition: width 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+    overflow: hidden;
+    z-index: 200;
+    box-shadow: 0 25px 60px rgba(10,25,18,0.7), 0 0 0 2000px rgba(5,12,8,0.55);
+    border-radius: 4px;
+    opacity: 0;
+    pointer-events: none;
+}
+.scroll-wrapper.active {
+    width: 92vw;
+    opacity: 1;
+    pointer-events: auto;
+}
+.scroll-wrapper::before,
+.scroll-wrapper::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 20px;
+    background: linear-gradient(90deg, #182820, #345244, #5c8573, #22382c);
+    z-index: 30;
+    box-shadow: inset 0 0 8px rgba(0,0,0,0.6);
+}
+.scroll-wrapper::before { left: 0; }
+.scroll-wrapper::after { right: 0; }
+
+.scroll-rod-top, .scroll-rod-bottom {
+    height: 42px;
+    width: 100%;
+    background: linear-gradient(180deg, #2b453a, #4a6b5d, #1c2e26);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    position: relative;
+    z-index: 25;
+    border-top: 1px solid rgba(255,255,255,0.15);
+    border-bottom: 1px solid rgba(0,0,0,0.4);
+}
+.scroll-rod-bottom {
+    position: absolute;
+    bottom: 0;
+}
+.scroll-header {
+    position: relative;
+    height: 110px;
+    background: linear-gradient(180deg, #e4ede6, #d0e0d4);
+    border-bottom: 2px solid #b2c9bc;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 40px;
+    z-index: 20;
+    box-shadow: inset 0 2px 4px rgba(255,255,255,0.7);
+}
+.scroll-title {
+    font-size: 16px;
+    color: #273d33;
+    font-weight: bold;
+    letter-spacing: 2px;
+    white-space: nowrap;
+    border-left: 3px solid #4a6b5d;
+    padding-left: 10px;
+    flex-shrink: 0;
+}
+.texture-select-area {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 16px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 10px 15px;
+    scroll-behavior: smooth;
+    align-items: center;
+    justify-content: center;
+    max-width: 60vw;
+}
+.texture-select-area::-webkit-scrollbar {
+    height: 5px;
+}
+.texture-select-area::-webkit-scrollbar-track {
+    background: rgba(74,107,93,0.1);
+    border-radius: 3px;
+}
+.texture-select-area::-webkit-scrollbar-thumb {
+    background: #4a6b5d;
+    border-radius: 3px;
+}
+.texture-item {
+    flex: 0 0 160px;  
+    height: 100px; 
+    border: 2px solid #9bb8ab;
+    cursor: pointer;
+    background-size: cover;
+    background-position: center;
+    border-radius: 4px;
+    transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    position: relative;
+}
+.texture-item:hover {
+    transform: translateY(-5px) scale(1.06);
+    border-color: #4a6b5d;
+    box-shadow: 0 8px 22px rgba(42,66,56,0.3);
+}
+.texture-item.active {
+    border-color: #20352b;
+    transform: scale(1.09);
+    box-shadow: 0 0 0 3px rgba(74, 107, 93, 0.4), 0 8px 22px rgba(0,0,0,0.35);
+}
+.btn-back-scroll {
+    flex-shrink: 0;
+    padding: 8px 18px;
+    border: 1px solid #4a6b5d;
+    background: rgba(240,247,242,0.9);
+    color: #273d33;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 13px;
+    white-space: nowrap;
+    transition: all 0.2s;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    z-index: 10;
+}
+.btn-back-scroll:hover {
+    background: #273d33;
+    color: #fff;
+}
+.canvas-viewport {
+    height: calc(88vh - 42px - 42px - 110px);
+    position: relative;
+    overflow: hidden;
+    background: #f7f9f6;
+}
+.scroll-canvas{
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+#mainCanvas { z-index: 1; }
+#inkCanvas { z-index: 2; }
+
+@media (max-width:1000px){
+    .container{ grid-template-columns:145px minmax(0,1fr) 175px; }
+    .header{ padding:0 18px; }
+    .title{ font-size:21px; letter-spacing:5px; }
+    .title-sub{ display:none; }
+    .topButton{ gap:6px; }
+    .topButton button{ padding:8px 11px; font-size:11px; }
+    .paper{ padding:9px; }
+}
+@media (max-width:760px){
+    .container{
+        grid-template-columns:82px minmax(0,1fr);
+        grid-template-rows:60px minmax(0,1fr) 58px;
+    }
+    .header{ grid-column:1/3; padding:0 12px; }
+    .brand{ gap:8px; }
+    .brand-mark{ width:30px; height:30px; font-size:14px; }
+    .title{ font-size:15px; letter-spacing:3px; }
+    .topButton button{ padding:7px 8px; font-size:9px; letter-spacing:1px; }
+    .topButton button:not(.backHome){ display:none; }
+    .left{ grid-column:1; grid-row:2; padding:15px 7px; gap:9px; }
+    .panel-caption, .color-title{ font-size:8px; letter-spacing:1px; }
+    .tool, .customColor, .size-group{ width:68px; }
+    .tool{ height:38px; font-size:10px; letter-spacing:1px; }
+    .colorBox{ grid-template-columns:repeat(2,22px); gap:7px; }
+    .color{ width:22px; height:22px; }
+    .center{ grid-column:2; grid-row:2; padding:15px 8px; }
+    .paper{ padding:6px; max-width:100%; }
+    .canvas-label, .right{ display:none; }
+    .footer{ grid-column:1/3; grid-row:3; }
+    .footer button{ min-width:65px; padding:8px 10px; font-size:11px; }
+    .footer .export{ min-width:105px; }
+}
+@media (prefers-reduced-motion:reduce){
+    *, *::before, *::after{ animation:none!important; transition:none!important; }
+}
+.ink-landscape{
+    position:fixed;
+    inset:0;
+    z-index:-1;
+    pointer-events:none;
+    overflow:hidden;
+}
+.ink-mountain-far, .ink-mountain-mid, .ink-mountain-near, .ink-mist, .ink-lake{
+    position:absolute;
+    pointer-events:none;
+}
+.ink-mountain-far{
+    left:-8%; bottom:17%; width:116%; height:48%; opacity:.34; filter:blur(10px);
+    background:
+        radial-gradient(ellipse at 8% 100%,rgba(91,113,106,.42) 0 18%,transparent 42%),
+        radial-gradient(ellipse at 24% 100%,rgba(112,131,124,.34) 0 15%,transparent 39%),
+        radial-gradient(ellipse at 42% 100%,rgba(81,104,96,.36) 0 20%,transparent 44%),
+        radial-gradient(ellipse at 61% 100%,rgba(119,137,130,.30) 0 16%,transparent 41%),
+        radial-gradient(ellipse at 80% 100%,rgba(85,106,99,.35) 0 19%,transparent 43%),
+        radial-gradient(ellipse at 97% 100%,rgba(111,129,122,.30) 0 16%,transparent 40%);
+    transform:translateY(8%);
+}
+.ink-mountain-mid{
+    left:-12%; bottom:14%; width:124%; height:39%; opacity:.27; filter:blur(5px);
+    background:
+        radial-gradient(ellipse at 3% 100%,rgba(66,91,83,.45) 0 13%,transparent 35%),
+        radial-gradient(ellipse at 20% 100%,rgba(98,119,111,.38) 0 18%,transparent 39%),
+        radial-gradient(ellipse at 38% 100%,rgba(72,96,88,.40) 0 15%,transparent 35%),
+        radial-gradient(ellipse at 56% 100%,rgba(107,125,118,.35) 0 18%,transparent 38%),
+        radial-gradient(ellipse at 75% 100%,rgba(76,99,92,.38) 0 16%,transparent 36%),
+        radial-gradient(ellipse at 93% 100%,rgba(99,118,111,.35) 0 15%,transparent 35%);
+    transform:translateY(13%);
+}
+.ink-mountain-near{
+    left:-8%; bottom:10%; width:116%; height:27%; opacity:.17; filter:blur(2px);
+    background:
+        radial-gradient(ellipse at 12% 100%,rgba(49,73,66,.50) 0 12%,transparent 31%),
+        radial-gradient(ellipse at 31% 100%,rgba(67,90,83,.42) 0 13%,transparent 32%),
+        radial-gradient(ellipse at 53% 100%,rgba(45,70,62,.46) 0 13%,transparent 32%),
+        radial-gradient(ellipse at 73% 100%,rgba(77,99,92,.40) 0 13%,transparent 32%),
+        radial-gradient(ellipse at 94% 100%,rgba(52,75,68,.42) 0 12%,transparent 31%);
+    transform:translateY(17%);
+}
+.ink-mist{
+    border-radius:50%; background:rgba(255,255,255,.46); filter:blur(34px); mix-blend-mode:screen;
+}
+.ink-mist-one{ width:44vw; height:13vh; left:4vw; bottom:28%; opacity:.65; }
+.ink-mist-two{ width:52vw; height:15vh; right:-4vw; bottom:22%; opacity:.55; }
+.ink-mist-three{ width:64vw; height:12vh; left:19vw; bottom:16%; opacity:.48; }
+.ink-lake{
+    left:0; right:0; bottom:0; height:18%; opacity:.40;
+    background:
+        linear-gradient(to bottom,rgba(102,126,118,0),rgba(91,116,107,.13)),
+        repeating-linear-gradient(180deg,transparent 0,transparent 19px,rgba(255,255,255,.13) 20px,transparent 21px);
+}
+</style>
+</head>
+<body>
+<div id="bgTexture"></div>
+<div class="ink-landscape">
+    <div class="ink-mountain-far"></div>
+    <div class="ink-mountain-mid"></div>
+    <div class="ink-mountain-near"></div>
+    <div class="ink-mist ink-mist-one"></div>
+    <div class="ink-mist ink-mist-two"></div>
+    <div class="ink-mist ink-mist-three"></div>
+    <div class="ink-lake"></div>
+</div>
+<div class="container">
+<div class="header">
+    <div class="brand">
+        <div class="brand-mark">墨</div>
+        <div>
+            <div class="title">烟雨西湖水墨绘</div>
+            <div class="title-sub">WEST LAKE · INK WASH STUDIO</div>
+        </div>
+    </div>
+    <div class="topButton">
+        <button class="backHome" onclick="location.href='index.html'">返回首页</button>
+        <button onclick="openTextureScroll()">切换底纹</button>
+        <button onclick="openModal('西湖贴纸素材：拱桥、荷花、游船、亭台、垂柳')">贴纸素材</button>
+    </div>
+</div>
+<div class="left">
+    <div class="panel-caption">创作工具</div>
+    <button class="tool active" id="brushBtn"> 水墨画笔 </button>
+    <button class="tool" id="splashBtn"> 泼墨笔触 </button> <!-- 新增：泼墨画笔效果 -->
+    <button class="tool" id="eraserBtn"> 橡皮擦 </button>
+    <div class="size-group">
+        <div class="size-head"><span>笔触粗细</span><span id="sizeValue">5</span></div>
+        <input class="slider" type="range" min="2" max="30" value="5" id="size">
+    </div>
+    <div class="color-title">墨色选择</div>
+    <div class="colorBox">
+        <div class="color active" style="background:#111" onclick="changeColor('#111',this)"></div>
+        <div class="color" style="background:#666" onclick="changeColor('#666',this)"></div>
+        <div class="color" style="background:#7f5539" onclick="changeColor('#7f5539',this)"></div>
+        <div class="color" style="background:#55738d" onclick="changeColor('#55738d',this)"></div>
+        <div class="color" style="background:#3b705c" onclick="changeColor('#3b705c',this)"></div>
+        <div class="color" style="background:#a86464" onclick="changeColor('#a86464',this)"></div>
+    </div>
+    <input type="color" class="customColor" id="customColorInput" value="#111">
+    <button class="tool" onclick="clearCanvas()"> 清空画布 </button>
+</div>
+<div class="center">
+    <div class="canvas-label"><span></span>西湖宣纸 · 自由创作<span></span></div>
+    <div class="paper">
+        <canvas id="canvas" width="980" height="620"></canvas>
+    </div>
+</div>
+<div class="right">
+    <h3>西湖贴纸素材库</h3>
+    <div class="sticker" onclick="openModal('已选中：拱桥素材，可手绘搭配创作')">拱桥</div>
+    <div class="sticker" onclick="openModal('已选中：荷花素材，可手绘搭配创作')">荷花</div>
+    <div class="sticker" onclick="openModal('已选中：游船素材，可手绘搭配创作')">游船</div>
+    <div class="sticker" onclick="openModal('已选中：亭台素材，可手绘搭配创作')">亭台</div>
+    <div class="sticker" onclick="openModal('已选中：垂柳素材，可手绘搭配创作')">垂柳</div>
+</div>
+<div class="footer">
+    <button onclick="undo()">撤销</button>
+    <button class="export" onclick="exportImg()">导出作品</button>
+    <button onclick="redo()">恢复</button>
+</div>
+</div>
+<div class="modal" id="modal">
+    <div class="modal-box">
+        <h4 id="modalText"></h4>
+        <button onclick="closeModal()">确定</button>
+    </div>
+</div>
+
+<!-- 卷轴面板 -->
+<div class="scroll-wrapper" id="scrollWrap">
+    <div class="scroll-rod-top"></div>
+    <div class="scroll-header">
+        <div class="scroll-title">选择底纹</div>
+        <div class="texture-select-area" id="textureSelectWrap"></div>
+        <button class="btn-back-scroll" id="backScroll">收起画轴</button>
+    </div>
+    <div class="canvas-viewport">
+        <canvas class="scroll-canvas" id="mainCanvas"></canvas>
+        <canvas class="scroll-canvas" id="inkCanvas"></canvas>
+    </div>
+    <div class="scroll-rod-bottom"></div>
+</div>
+
+<script>
+const textureList = [
+    "westlake01.jpg", "westlake02.jpg", "westlake03.jpg", "westlake04.jpg", "westlake05.jpg",
+    "westlake06.jpg", "westlake07.jpg", "westlake08.jpg", "westlake09.jpg", "westlake10.jpg"
+];
+let textureIndex = 0;
+const bgTextureDom = document.getElementById("bgTexture");
+const scrollWrap = document.getElementById('scrollWrap');
+const textureSelectWrap = document.getElementById('textureSelectWrap');
+const backScrollBtn = document.getElementById('backScroll');
+
+bgTextureDom.style.backgroundImage = `url(./images/${textureList[textureIndex]})`;
+
+function buildTextureItems(){
+    textureSelectWrap.innerHTML = "";
+    textureList.forEach((filename,idx)=>{
+        const item = document.createElement('div');
+        item.className = "texture-item"+(idx===textureIndex?" active":"");
+        item.style.backgroundImage = `url(./images/${filename})`;
+        item.dataset.idx = idx;
+        item.addEventListener('click',()=>selectTextureByIndex(idx));
+        textureSelectWrap.appendChild(item);
+    })
+}
+function selectTextureByIndex(idx){
+    textureIndex = idx;
+    bgTextureDom.style.backgroundImage = `url(./images/${textureList[textureIndex]})`;
+    document.querySelectorAll('.texture-item').forEach(el=>el.classList.remove('active'));
+    const activeItem = document.querySelector(`.texture-item[data-idx="${idx}"]`);
+    if(activeItem) activeItem.classList.add('active');
+}
+function openTextureScroll(){
+    buildTextureItems();
+    scrollWrap.classList.add('active');
+    setTimeout(syncScrollCanvasSize, 100);
+}
+backScrollBtn.onclick = function(){ scrollWrap.classList.remove('active'); }
+
+const mainCanvas = document.getElementById('mainCanvas');
+const inkCanvas = document.getElementById('inkCanvas');
+function syncScrollCanvasSize(){
+    const viewport = document.querySelector('.canvas-viewport');
+    if(viewport){
+        mainCanvas.width = viewport.clientWidth;
+        mainCanvas.height = viewport.clientHeight;
+        inkCanvas.width = viewport.clientWidth;
+        inkCanvas.height = viewport.clientHeight;
+    }
+}
+window.addEventListener('resize',()=>{ if(scrollWrap.classList.contains('active')) syncScrollCanvasSize(); })
+
+const canvas=document.getElementById("canvas");
+const ctx=canvas.getContext("2d");
+const brushBtn=document.getElementById("brushBtn");
+const splashBtn=document.getElementById("splashBtn");
+const eraserBtn=document.getElementById("eraserBtn");
+const customColorInput=document.getElementById("customColorInput");
+const colorItems = document.querySelectorAll('.color');
+
+let drawing=false;
+let color="#111";
+let size=5;
+let currentTool="brush"; // "brush", "splash", "eraser"
+let history=[];
+let step=-1;
+let lastX = 0, lastY = 0;
+
+document.getElementById("size").oninput=function(){ size=this.value; document.getElementById("sizeValue").textContent=this.value; }
+customColorInput.oninput=function(){ color=this.value; switchTool('brush'); clearColorActive(); }
+function changeColor(c,el){ color=c; customColorInput.value=c; switchTool('brush'); clearColorActive(); el.classList.add('active'); }
+function clearColorActive(){ colorItems.forEach(item=>item.classList.remove('active')); }
+
+function switchTool(toolName){
+    currentTool = toolName;
+    brushBtn.classList.remove("active");
+    splashBtn.classList.remove("active");
+    eraserBtn.classList.remove("active");
+    
+    if(toolName === "brush") brushBtn.classList.add("active");
+    else if(toolName === "splash") splashBtn.classList.add("active");
+    else if(toolName === "eraser") eraserBtn.classList.add("active");
+}
+brushBtn.onclick=()=>switchTool("brush");
+splashBtn.onclick=()=>switchTool("splash");
+eraserBtn.onclick=()=>switchTool("eraser");
+
+function getCanvasPoint(e){
+    const rect=canvas.getBoundingClientRect();
+    const scaleX=canvas.width/rect.width;
+    const scaleY=canvas.height/rect.height;
+    return {
+        x:(e.clientX-rect.left)*scaleX,
+        y:(e.clientY-rect.top)*scaleY
+    };
+}
+
+canvas.onmousedown=function(e){
+    drawing=true;
+    const point=getCanvasPoint(e);
+    lastX = point.x;
+    lastY = point.y;
+    ctx.beginPath();
+    ctx.moveTo(point.x, point.y);
+    save();
+}
+
+canvas.onmousemove=function(e){
+    if(!drawing) return;
+    const point=getCanvasPoint(e);
+    
+    if(currentTool === "eraser"){
+        ctx.globalCompositeOperation="destination-out";
+        ctx.strokeStyle="rgba(255,255,255,1)";
+        ctx.lineWidth=size*1.5;
+        ctx.lineCap="round";
+        ctx.lineJoin="round";
+        ctx.lineTo(point.x, point.y);
+        ctx.stroke();
+    } else if(currentTool === "splash"){
+        // 泼墨/毛笔浓墨晕染效果：绘制多重随机散点及粗细不均的半透明边
+        ctx.globalCompositeOperation="source-over";
+        const dist = Math.hypot(point.x - lastX, point.y - lastY);
+        const steps = Math.max(Math.floor(dist / 2), 1);
+        
+        for(let i = 0; i < steps; i++){
+            const x = lastX + (point.x - lastX) * (i / steps);
+            const y = lastY + (point.y - lastY) * (i / steps);
+            
+            // 核心墨迹
+            ctx.fillStyle = color;
+            ctx.globalAlpha = 0.45;
+            ctx.beginPath();
+            ctx.arc(x, y, (size * 0.8) + Math.random() * (size * 0.4), 0, Math.PI * 2);
+            ctx.fill();
+
+            // 边缘干擦墨点（水墨散开感）
+            for(let j = 0; j < 3; j++){
+                const angle = Math.random() * Math.PI * 2;
+                const offset = Math.random() * size * 1.2;
+                ctx.fillStyle = color;
+                ctx.globalAlpha = 0.15;
+                ctx.beginPath();
+                ctx.arc(x + Math.cos(angle)*offset, y + Math.sin(angle)*offset, Math.random() * 2 + 1, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+    } else {
+        // 普通水墨画笔
+        ctx.globalCompositeOperation="source-over";
+        ctx.strokeStyle=color;
+        ctx.lineWidth=size;
+        ctx.globalAlpha=0.88;
+        ctx.lineCap="round";
+        ctx.lineJoin="round";
+        ctx.lineTo(point.x, point.y);
+        ctx.stroke();
+    }
+    
+    lastX = point.x;
+    lastY = point.y;
+}
+
+window.onmouseup=function(){
+    if(!drawing) return;
+    drawing=false;
+    ctx.globalAlpha=1;
+    ctx.globalCompositeOperation="source-over";
+}
+
+canvas.addEventListener("touchstart",function(e){
+    e.preventDefault();
+    const touch=e.touches[0];
+    drawing=true;
+    const point=getCanvasPoint(touch);
+    lastX = point.x;
+    lastY = point.y;
+    ctx.beginPath();
+    ctx.moveTo(point.x, point.y);
+    save();
+},{passive:false});
+
+canvas.addEventListener("touchmove",function(e){
+    e.preventDefault();
+    if(!drawing) return;
+    const touch=e.touches[0];
+    const point=getCanvasPoint(touch);
+    
+    if(currentTool === "eraser"){
+        ctx.globalCompositeOperation="destination-out";
+        ctx.strokeStyle="rgba(255,255,255,1)";
+        ctx.lineWidth=size*1.5;
+        ctx.lineCap="round";
+        ctx.lineJoin="round";
+        ctx.lineTo(point.x, point.y);
+        ctx.stroke();
+    } else if(currentTool === "splash"){
+        ctx.globalCompositeOperation="source-over";
+        const dist = Math.hypot(point.x - lastX, point.y - lastY);
+        const steps = Math.max(Math.floor(dist / 2), 1);
+        for(let i = 0; i < steps; i++){
+            const x = lastX + (point.x - lastX) * (i / steps);
+            const y = lastY + (point.y - lastY) * (i / steps);
+            ctx.fillStyle = color;
+            ctx.globalAlpha = 0.45;
+            ctx.beginPath();
+            ctx.arc(x, y, (size * 0.8) + Math.random() * (size * 0.4), 0, Math.PI * 2);
+            ctx.fill();
+        }
+    } else {
+        ctx.globalCompositeOperation="source-over";
+        ctx.strokeStyle=color;
+        ctx.lineWidth=size;
+        ctx.globalAlpha=0.88;
+        ctx.lineCap="round";
+        ctx.lineJoin="round";
+        ctx.lineTo(point.x, point.y);
+        ctx.stroke();
+    }
+    lastX = point.x;
+    lastY = point.y;
+},{passive:false});
+
+canvas.addEventListener("touchend",function(){
+    if(!drawing) return;
+    drawing=false;
+    ctx.globalAlpha=1;
+    ctx.globalCompositeOperation="source-over";
+});
+
+function save(){
+    step++;
+    history.length=step;
+    history.push(canvas.toDataURL());
+    if(history.length > 50){
+        history.shift();
+        step--;
+    }
+}
+function undo(){
+    if(step<=0)return;
+    step--;
+    let img=new Image();
+    img.src=history[step];
+    img.onload=()=>{
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        ctx.drawImage(img,0,0);
+    }
+}
+function redo(){
+    if(step>=history.length-1)return;
+    step++;
+    let img=new Image();
+    img.src=history[step];
+    img.onload=()=>{
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        ctx.drawImage(img,0,0);
+    }
+}
+function clearCanvas(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    save();
+}
+function exportImg(){
+    let link = document.createElement('a');
+    link.download = '烟雨西湖水墨作品.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+}
+function openModal(text){
+    document.getElementById('modalText').innerText = text;
+    document.getElementById('modal').style.display = 'flex';
+}
+function closeModal(){
+    document.getElementById('modal').style.display = 'none';
+}
+save();
+</script>
+</body>
+</html>
