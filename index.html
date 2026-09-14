@@ -1,186 +1,1117 @@
+```html
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>烟雨西湖水墨绘 | 首页</title>
+
+<title>烟雨西湖水墨绘</title>
+
 <style>
+
 * {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: "STSong", "宋体", serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html,
+body {
+    width: 100%;
+    height: 100%;
 }
 
 body {
-  width: 100vw;
-  height: 100vh;
-  overflow: hidden;
-  /* 匹配画板西湖渐变底色，风格统一 */
-  background: linear-gradient(#edf6f4,#dce9e5);
-  color: #3f4b47;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  position: relative;
+    position: relative;
+    overflow: hidden;
+
+    color: #344640;
+
+    font-family:
+        "STSong",
+        "Songti SC",
+        "SimSun",
+        serif;
+
+    background:
+        radial-gradient(
+            ellipse at 50% 16%,
+            #f8f8f2 0%,
+            #eef4f0 32%,
+            #e2ece8 65%,
+            #d3e1dd 100%
+        );
 }
 
-/* 宣纸纹理底纹，替换失效外链，本地生效 */
-body::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  background-color: rgba(250, 248, 242, 0.35);
-  pointer-events: none;
-  z-index: 1;
+body::before {
+    content: "";
+
+    position: fixed;
+    inset: 0;
+
+    z-index: 1;
+
+    pointer-events: none;
+
+    opacity: 0.3;
+
+    background-image:
+        repeating-linear-gradient(
+            0deg,
+            rgba(70, 85, 79, 0.018) 0,
+            rgba(70, 85, 79, 0.018) 1px,
+            transparent 1px,
+            transparent 5px
+        ),
+        repeating-linear-gradient(
+            90deg,
+            rgba(255, 255, 255, 0.12) 0,
+            rgba(255, 255, 255, 0.12) 1px,
+            transparent 1px,
+            transparent 7px
+        );
 }
 
-/* 水墨浮动粒子背景 */
-.ink-bg {
-  position: fixed;
-  inset: 0;
-  z-index: 2;
-  pointer-events: none;
+#rainCanvas {
+    position: fixed;
+
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    z-index: 2;
+
+    pointer-events: none;
 }
 
-/* 首页主体内容 */
-.home-box {
-  position: relative;
-  z-index: 3;
-  text-align: center;
-  animation: float 6s ease-in-out infinite;
+.scene {
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 3;
+
+    pointer-events: none;
 }
 
-@keyframes float {
-  0%,100% { transform: translateY(0); opacity: 0.9; }
-  50% { transform: translateY(-8px); opacity: 1; }
+.mountain-back {
+    position: absolute;
+
+    left: -10%;
+    bottom: 26%;
+
+    width: 120%;
+    height: 32%;
+
+    opacity: 0.1;
+
+    filter: blur(8px);
+
+    background:
+        radial-gradient(
+            ellipse at 20% 100%,
+            #536a64 0%,
+            transparent 50%
+        ),
+        radial-gradient(
+            ellipse at 72% 100%,
+            #536a64 0%,
+            transparent 52%
+        );
 }
 
-.home-title {
-  font-size: 62px;
-  letter-spacing: 12px;
-  font-weight: bold;
-  margin-bottom: 20px;
-  color: #3f4b47;
-  text-shadow: 0 2px 8px rgba(0,0,0,0.08);
+.mountain {
+    position: absolute;
+
+    left: -5%;
+    bottom: 17%;
+
+    width: 110%;
+    height: 43%;
+
+    opacity: 0.2;
+
+    filter: blur(1px);
+
+    background:
+        radial-gradient(
+            ellipse at 7% 100%,
+            #60766f 0%,
+            transparent 48%
+        ),
+        radial-gradient(
+            ellipse at 29% 100%,
+            #7d908a 0%,
+            transparent 45%
+        ),
+        radial-gradient(
+            ellipse at 52% 100%,
+            #5d716a 0%,
+            transparent 50%
+        ),
+        radial-gradient(
+            ellipse at 79% 100%,
+            #70837d 0%,
+            transparent 46%
+        );
 }
 
-.home-desc {
-  font-size: 20px;
-  letter-spacing: 4px;
-  color: #60706b;
-  margin-bottom: 50px;
+.lake {
+    position: absolute;
+
+    left: 0;
+    bottom: 0;
+
+    width: 100%;
+    height: 28%;
+
+    background:
+        linear-gradient(
+            to bottom,
+            rgba(190, 207, 201, 0.05),
+            rgba(120, 151, 142, 0.23)
+        );
 }
 
-/* 国风主按钮 */
-.start-btn {
-  padding: 16px 52px;
-  font-size: 18px;
-  letter-spacing: 4px;
-  background: #6d817b;
-  color: #fff;
-  border: none;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(109, 129, 123, 0.25);
+.lake::before {
+    content: "";
+
+    position: absolute;
+
+    inset: 0;
+
+    opacity: 0.35;
+
+    background:
+        repeating-linear-gradient(
+            180deg,
+            transparent 0,
+            transparent 14px,
+            rgba(255, 255, 255, 0.13) 15px,
+            transparent 16px
+        );
 }
 
-.start-btn:hover {
-  background: #4f6a63;
-  transform: translateY(-3px);
-  box-shadow: 0 8px 25px rgba(109, 129, 123, 0.35);
+.mist {
+    position: absolute;
+
+    border-radius: 50%;
+
+    filter: blur(48px);
+
+    background: rgba(255, 255, 255, 0.32);
 }
 
-/* 底部落款 */
-.footer-text {
-  position: absolute;
-  bottom: 30px;
-  font-size: 14px;
-  color: #7b8f89;
-  letter-spacing: 2px;
-  z-index: 3;
+.mist-one {
+    width: 560px;
+    height: 170px;
+
+    left: -130px;
+    top: 34%;
+
+    animation:
+        mistMoveOne 20s ease-in-out infinite;
 }
 
-/* 移动端适配 */
+.mist-two {
+    width: 680px;
+    height: 190px;
+
+    right: -180px;
+    top: 42%;
+
+    opacity: 0.65;
+
+    animation:
+        mistMoveTwo 24s ease-in-out infinite;
+}
+
+.mist-three {
+    width: 720px;
+    height: 180px;
+
+    left: 22%;
+    bottom: 20%;
+
+    opacity: 0.42;
+
+    animation:
+        mistMoveThree 28s ease-in-out infinite;
+}
+
+@keyframes mistMoveOne {
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    50% {
+        transform: translateX(130px);
+    }
+}
+
+@keyframes mistMoveTwo {
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    50% {
+        transform: translateX(-120px);
+    }
+}
+
+@keyframes mistMoveThree {
+
+    0%,
+    100% {
+        transform: translateX(-50px);
+    }
+
+    50% {
+        transform: translateX(80px);
+    }
+}
+
+.content {
+    position: absolute;
+
+    z-index: 10;
+
+    top: 50%;
+    left: 50%;
+
+    transform:
+        translate(-50%, -52%);
+
+    width: min(820px, 90vw);
+
+    text-align: center;
+
+    animation:
+        contentFloat 8s ease-in-out infinite;
+}
+
+@keyframes contentFloat {
+
+    0%,
+    100% {
+        transform:
+            translate(-50%, -52%);
+    }
+
+    50% {
+        transform:
+            translate(
+                -50%,
+                calc(-52% - 5px)
+            );
+    }
+}
+
+.small-title {
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 18px;
+
+    margin-bottom: 24px;
+
+    color: #75847f;
+
+    font-size: 13px;
+
+    letter-spacing: 8px;
+}
+
+.small-title span {
+    width: 42px;
+    height: 1px;
+
+    display: block;
+
+    background:
+        linear-gradient(
+            to right,
+            transparent,
+            rgba(92, 112, 105, 0.65)
+        );
+}
+
+.small-title span:last-child {
+    transform: rotate(180deg);
+}
+
+.title {
+    font-family:
+        "FZQingKeBenYueSongS-R-GB",
+        "FZKai-Z03",
+        "STKaiti",
+        "Kaiti SC",
+        "KaiTi",
+        "STSong",
+        "Songti SC",
+        serif;
+
+    font-size:
+        clamp(
+            48px,
+            7vw,
+            78px
+        );
+
+    font-weight: 500;
+
+    letter-spacing: 13px;
+
+    margin-right: -13px;
+
+    line-height: 1.35;
+
+    color: #30433e;
+
+    background:
+        linear-gradient(
+            180deg,
+            #253732 0%,
+            #334a43 38%,
+            #52665f 72%,
+            #71817b 100%
+        );
+
+    -webkit-background-clip: text;
+
+    background-clip: text;
+
+    -webkit-text-fill-color: transparent;
+
+    text-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.75),
+        0 4px 12px rgba(48, 66, 60, 0.08);
+
+    transform:
+        scaleX(0.97);
+
+    transform-origin: center;
+
+    animation:
+        titleInk 2.2s ease-out both;
+}
+
+@keyframes titleInk {
+
+    from {
+        opacity: 0;
+
+        transform:
+            scaleX(1.02)
+            translateY(8px);
+
+        filter: blur(3px);
+    }
+
+    to {
+        opacity: 1;
+
+        transform:
+            scaleX(0.97)
+            translateY(0);
+
+        filter: blur(0);
+    }
+}
+
+.ink-line {
+    position: relative;
+
+    width: 190px;
+    height: 10px;
+
+    margin:
+        13px auto 22px;
+
+    opacity: 0.5;
+}
+
+.ink-line::before {
+    content: "";
+
+    position: absolute;
+
+    top: 5px;
+    left: 0;
+
+    width: 100%;
+    height: 1px;
+
+    background:
+        linear-gradient(
+            to right,
+            transparent,
+            #657770 20%,
+            #657770 80%,
+            transparent
+        );
+}
+
+.ink-line::after {
+    content: "·";
+
+    position: absolute;
+
+    left: 50%;
+    top: -5px;
+
+    transform:
+        translateX(-50%);
+
+    color: #60736c;
+
+    font-size: 18px;
+}
+
+.subtitle {
+    font-family:
+        "STSong",
+        "Songti SC",
+        "SimSun",
+        serif;
+
+    font-size: 18px;
+
+    font-weight: 400;
+
+    letter-spacing: 8px;
+
+    margin-right: -8px;
+
+    color: #65766f;
+
+    text-shadow:
+        0 1px 3px
+        rgba(255, 255, 255, 0.7);
+}
+
+.start-button {
+    position: relative;
+
+    margin-top: 46px;
+
+    width: 215px;
+    height: 52px;
+
+    border:
+        1px solid
+        rgba(77, 101, 93, 0.42);
+
+    border-radius: 2px;
+
+    background:
+        rgba(255, 255, 255, 0.16);
+
+    color: #40534d;
+
+    font-family:
+        "STSong",
+        "Songti SC",
+        serif;
+
+    font-size: 16px;
+
+    letter-spacing: 5px;
+
+    cursor: pointer;
+
+    overflow: hidden;
+
+    backdrop-filter:
+        blur(6px);
+
+    transition:
+        transform 0.4s ease,
+        color 0.4s ease,
+        background 0.4s ease,
+        box-shadow 0.4s ease;
+}
+
+.start-button::before {
+    content: "";
+
+    position: absolute;
+
+    inset: 0;
+
+    z-index: -1;
+
+    transform:
+        scaleX(0);
+
+    transform-origin: left;
+
+    background:
+        #526b63;
+
+    transition:
+        transform 0.45s ease;
+}
+
+.start-button:hover {
+    color: white;
+
+    transform:
+        translateY(-3px);
+
+    box-shadow:
+        0 12px 30px
+        rgba(62, 83, 76, 0.2);
+}
+
+.start-button:hover::before {
+    transform:
+        scaleX(1);
+}
+
+.start-button:active {
+    transform:
+        translateY(-1px);
+}
+
+.footer {
+    position: fixed;
+
+    z-index: 20;
+
+    left: 50%;
+    bottom: 25px;
+
+    transform:
+        translateX(-50%);
+
+    white-space: nowrap;
+
+    color: #7a8b86;
+
+    font-family:
+        "STSong",
+        "Songti SC",
+        serif;
+
+    font-size: 12px;
+
+    letter-spacing: 4px;
+
+    opacity: 0.8;
+}
+
+.light-haze {
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 4;
+
+    pointer-events: none;
+
+    background:
+        radial-gradient(
+            ellipse at center,
+            rgba(255, 255, 255, 0.12),
+            transparent 65%
+        );
+}
+
 @media (max-width: 768px) {
-  .home-title {
-    font-size: 38px;
-    letter-spacing: 6px;
-  }
-  .home-desc {
-    font-size: 16px;
-  }
-  .start-btn {
-    padding: 14px 40px;
-    font-size: 16px;
-  }
+
+    .content {
+        width: 90vw;
+    }
+
+    .small-title {
+        font-size: 11px;
+
+        letter-spacing: 5px;
+    }
+
+    .small-title span {
+        width: 25px;
+    }
+
+    .title {
+        font-size: 42px;
+
+        letter-spacing: 8px;
+
+        margin-right: -8px;
+    }
+
+    .subtitle {
+        font-size: 14px;
+
+        letter-spacing: 5px;
+
+        margin-right: -5px;
+    }
+
+    .start-button {
+        width: 190px;
+
+        height: 48px;
+
+        font-size: 14px;
+
+        letter-spacing: 4px;
+    }
+
+    .footer {
+        bottom: 18px;
+
+        font-size: 9px;
+
+        letter-spacing: 2px;
+    }
 }
+
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+
+        animation: none !important;
+
+        transition: none !important;
+    }
+}
+
 </style>
 </head>
-<body>
-<canvas class="ink-bg" id="bgCanvas"></canvas>
 
-<div class="home-box">
-  <h1 class="home-title">烟雨西湖水墨绘</h1>
-  <p class="home-desc">一笔落烟雨，水墨绘西湖</p>
-  <button class="start-btn" onclick="location.href='draw.html'">进入画板创作</button>
+
+<body>
+
+<canvas id="rainCanvas"></canvas>
+
+<div class="scene">
+
+    <div class="mountain-back"></div>
+
+    <div class="mountain"></div>
+
+    <div class="lake"></div>
+
+    <div class="mist mist-one"></div>
+
+    <div class="mist mist-two"></div>
+
+    <div class="mist mist-three"></div>
+
 </div>
 
-<div class="footer-text">国风手绘 · 西湖水墨专属画板</div>
+<div class="light-haze"></div>
+
+<main class="content">
+
+    <div class="small-title">
+
+        <span></span>
+
+        西湖 · 烟雨
+
+        <span></span>
+
+    </div>
+
+    <h1 class="title">
+        烟雨西湖水墨绘
+    </h1>
+
+    <div class="ink-line"></div>
+
+    <p class="subtitle">
+        一笔落烟雨 · 水墨绘西湖
+    </p>
+
+    <button
+        class="start-button"
+        onclick="location.href='draw.html'"
+    >
+        进入画板
+    </button>
+
+</main>
+
+<div class="footer">
+    国风手绘 · 西湖水墨专属画板
+</div>
+
 
 <script>
-// 水墨云雾动态背景
-const bgCanvas = document.getElementById("bgCanvas");
-const bgCtx = bgCanvas.getContext("2d");
-let w, h;
+
+const canvas =
+    document.getElementById(
+        "rainCanvas"
+    );
+
+const ctx =
+    canvas.getContext("2d");
+
+let width = 0;
+let height = 0;
+
+let rain = [];
+let ripples = [];
+
 
 function resize() {
-  w = bgCanvas.width = window.innerWidth;
-  h = bgCanvas.height = window.innerHeight;
-}
-resize();
-window.addEventListener("resize", resize);
 
-// 水墨粒子效果
-class InkParticle {
-  constructor(){
-    this.x = Math.random() * w;
-    this.y = Math.random() * h;
-    this.r = Math.random() * 80 + 40;
-    this.a = Math.random() * 0.03 + 0.008;
-    this.speedX = (Math.random() - 0.5) * 0.12;
-    this.speedY = (Math.random() - 0.5) * 0.12;
-  }
-  update(){
-    this.x += this.speedX;
-    this.y += this.speedY;
-    if(this.x > w + 100) this.x = -100;
-    if(this.x < -100) this.x = w + 100;
-    if(this.y > h + 100) this.y = -100;
-    if(this.y < -100) this.y = h + 100;
-  }
-  draw(){
-    bgCtx.beginPath();
-    bgCtx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
-    bgCtx.fillStyle = `rgba(180, 195, 190, ${this.a})`;
-    bgCtx.fill();
-  }
+    const dpr =
+        Math.min(
+            window.devicePixelRatio || 1,
+            2
+        );
+
+    width =
+        window.innerWidth;
+
+    height =
+        window.innerHeight;
+
+    canvas.width =
+        width * dpr;
+
+    canvas.height =
+        height * dpr;
+
+    canvas.style.width =
+        width + "px";
+
+    canvas.style.height =
+        height + "px";
+
+    ctx.setTransform(
+        dpr,
+        0,
+        0,
+        dpr,
+        0,
+        0
+    );
+
+    createRain();
 }
 
-let particles = [];
-for(let i = 0; i < 15; i++) particles.push(new InkParticle());
+
+window.addEventListener(
+    "resize",
+    resize
+);
+
+
+function createRain() {
+
+    rain = [];
+
+    const count =
+        Math.min(
+            280,
+            Math.max(
+                120,
+                Math.floor(
+                    width * 0.23
+                )
+            )
+        );
+
+
+    for (
+        let i = 0;
+        i < count;
+        i++
+    ) {
+
+        rain.push({
+
+            x:
+                Math.random() *
+                width,
+
+            y:
+                Math.random() *
+                height,
+
+            length:
+                Math.random() *
+                13 + 7,
+
+            speed:
+                Math.random() *
+                2 + 2.4,
+
+            opacity:
+                Math.random() *
+                0.18 + 0.035,
+
+            width:
+                Math.random() *
+                0.65 + 0.2,
+
+            drift:
+                Math.random() *
+                0.25 + 0.08
+        });
+    }
+}
+
+
+function drawRain() {
+
+    ctx.lineCap =
+        "round";
+
+
+    rain.forEach(
+        drop => {
+
+            ctx.beginPath();
+
+            ctx.moveTo(
+                drop.x,
+                drop.y
+            );
+
+            ctx.lineTo(
+                drop.x +
+                drop.drift,
+
+                drop.y +
+                drop.length
+            );
+
+            ctx.strokeStyle =
+                `rgba(
+                    74,
+                    96,
+                    91,
+                    ${drop.opacity}
+                )`;
+
+            ctx.lineWidth =
+                drop.width;
+
+            ctx.stroke();
+
+
+            drop.x +=
+                drop.drift;
+
+            drop.y +=
+                drop.speed;
+
+
+            if (
+                drop.y >
+                height + 20
+            ) {
+
+                drop.y =
+                    -Math.random() *
+                    100;
+
+                drop.x =
+                    Math.random() *
+                    width;
+            }
+
+
+            if (
+                drop.x >
+                width + 20
+            ) {
+
+                drop.x = -20;
+            }
+
+        }
+    );
+}
+
+
+function createRipple() {
+
+    if (
+        Math.random() >
+        0.08
+    ) {
+        return;
+    }
+
+
+    ripples.push({
+
+        x:
+            Math.random() *
+            width,
+
+        y:
+            height * 0.75 +
+            Math.random() *
+            height * 0.2,
+
+        radius: 1,
+
+        alpha: 0.22
+    });
+}
+
+
+function drawRipples() {
+
+    ripples.forEach(
+        (ripple, index) => {
+
+            ctx.beginPath();
+
+            ctx.ellipse(
+
+                ripple.x,
+
+                ripple.y,
+
+                ripple.radius *
+                2.4,
+
+                ripple.radius *
+                0.7,
+
+                0,
+
+                0,
+
+                Math.PI * 2
+            );
+
+
+            ctx.strokeStyle =
+                `rgba(
+                    75,
+                    101,
+                    94,
+                    ${ripple.alpha}
+                )`;
+
+            ctx.lineWidth =
+                0.7;
+
+            ctx.stroke();
+
+
+            ripple.radius +=
+                0.55;
+
+            ripple.alpha -=
+                0.004;
+
+
+            if (
+                ripple.alpha <= 0
+            ) {
+
+                ripples.splice(
+                    index,
+                    1
+                );
+            }
+
+        }
+    );
+}
+
+
+function drawAtmosphere() {
+
+    const gradient =
+        ctx.createRadialGradient(
+
+            width * 0.5,
+
+            height * 0.42,
+
+            0,
+
+            width * 0.5,
+
+            height * 0.42,
+
+            Math.min(
+                width,
+                height
+            ) * 0.65
+        );
+
+
+    gradient.addColorStop(
+        0,
+        "rgba(255,255,255,0.13)"
+    );
+
+    gradient.addColorStop(
+        0.55,
+        "rgba(255,255,255,0.035)"
+    );
+
+    gradient.addColorStop(
+        1,
+        "rgba(255,255,255,0)"
+    );
+
+
+    ctx.fillStyle =
+        gradient;
+
+    ctx.fillRect(
+        0,
+        0,
+        width,
+        height
+    );
+}
+
 
 function animate() {
-  bgCtx.clearRect(0, 0, w, h);
-  particles.forEach(item => {
-    item.update();
-    item.draw();
-  })
-  requestAnimationFrame(animate);
+
+    ctx.clearRect(
+        0,
+        0,
+        width,
+        height
+    );
+
+    drawAtmosphere();
+
+    drawRain();
+
+    drawRipples();
+
+    createRipple();
+
+    requestAnimationFrame(
+        animate
+    );
 }
+
+
+resize();
+
 animate();
+
 </script>
+
 </body>
 </html>
+```

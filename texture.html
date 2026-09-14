@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>选择底纹 - texture.html</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            overflow: hidden;
+            font-family: "SimSun", "STSong", serif;
+            background-color: #0b120e;
+        }
+        .app-wrap {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+        /* 底纹背景层，在画布下方 */
+        .texture-bg-layer {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            background-size: cover;
+            background-position: center;
+            transition: background-image 0.5s ease;
+        }
+        /* 主绘制页面 */
+        .draw-home {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+        #drawCanvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+            position: relative;
+            z-index: 1;
+            background: transparent;
+        }
+        /* 打开卷轴底纹面板按钮（青竹配色） */
+        .open-scroll-btn {
+            position: absolute;
+            top: 28px;
+            left: 28px;
+            z-index: 100;
+            padding: 11px 24px;
+            border: 1px solid #4a6b5d;
+            background: linear-gradient(135deg, rgba(240,247,242,0.95), rgba(220,235,225,0.9));
+            color: #2c4238;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.25);
+            transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        .open-scroll-btn:hover {
+            background: #eef6f0;
+            border-color: #2c4238;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        /* 卷轴容器：居中展开（青色系背景与阴影） */
+        .scroll-wrapper {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 0vw; 
+            height: 88vh;
+            max-width: 1350px;
+            background-color: #f3f7f4;
+            transition: width 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+            overflow: hidden;
+            z-index: 200;
+            box-shadow: 0 25px 60px rgba(10,25,18,0.7), 0 0 0 2000px rgba(5,12,8,0.55);
+            border-radius: 4px;
+            opacity: 0;
+            pointer-events: none;
+        }
+        .scroll-wrapper.active {
+            width: 92vw;
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* 卷轴左右两侧轴头（青翠玉石/深青竹节质感） */
+        .scroll-wrapper::before,
+        .scroll-wrapper::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 20px;
+            background: linear-gradient(90deg, #182820, #345244, #5c8573, #22382c);
+            z-index: 30;
+            box-shadow: inset 0 0 8px rgba(0,0,0,0.6);
+        }
+        .scroll-wrapper::before { left: 0; }
+        .scroll-wrapper::after { right: 0; }
+
+        /* 卷轴上下轴（青竹绿质感渐变） */
+        .scroll-rod-top, .scroll-rod-bottom {
+            height: 42px;
+            width: 100%;
+            background: linear-gradient(180deg, #2b453a, #4a6b5d, #1c2e26);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+            position: relative;
+            z-index: 25;
+            border-top: 1px solid rgba(255,255,255,0.15);
+            border-bottom: 1px solid rgba(0,0,0,0.4);
+        }
+        .scroll-rod-bottom {
+            position: absolute;
+            bottom: 0;
+        }
+
+        /* 顶栏：青色系优雅过渡 */
+        .scroll-header {
+            position: relative;
+            height: 110px;
+            background: linear-gradient(180deg, #e4ede6, #d0e0d4);
+            border-bottom: 2px solid #b2c9bc;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 40px;
+            z-index: 20;
+            box-shadow: inset 0 2px 4px rgba(255,255,255,0.7);
+        }
+
+        .scroll-title {
+            font-size: 16px;
+            color: #273d33;
+            font-weight: bold;
+            letter-spacing: 2px;
+            white-space: nowrap;
+            border-left: 3px solid #4a6b5d;
+            padding-left: 10px;
+            flex-shrink: 0;
+        }
+
+        /* 底纹选择区域：完美居中，确保所有缩略图不压缩、等比例放大 */
+        .texture-select-area {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 16px;
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding: 10px 15px;
+            scroll-behavior: smooth;
+            align-items: center;
+            max-width: 60vw;
+        }
+        .texture-select-area::-webkit-scrollbar {
+            height: 5px;
+        }
+        .texture-select-area::-webkit-scrollbar-track {
+            background: rgba(74,107,93,0.1);
+            border-radius: 3px;
+        }
+        .texture-select-area::-webkit-scrollbar-thumb {
+            background: #4a6b5d;
+            border-radius: 3px;
+        }
+
+        /* 等比例放大缩略图，配合悬停微动效果与青色系边框/阴影 */
+        .texture-item {
+            flex: 0 0 160px;  
+            height: 100px; 
+            border: 2px solid #9bb8ab;
+            cursor: pointer;
+            background-size: cover;
+            background-position: center;
+            border-radius: 4px;
+            transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            position: relative;
+        }
+        .texture-item:hover {
+            transform: translateY(-5px) scale(1.06);
+            border-color: #4a6b5d;
+            box-shadow: 0 8px 22px rgba(42,66,56,0.3);
+        }
+        .texture-item.active {
+            border-color: #20352b;
+            transform: scale(1.09);
+            box-shadow: 0 0 0 3px rgba(74, 107, 93, 0.4), 0 8px 22px rgba(0,0,0,0.35);
+        }
+
+        /* 返回/收起按钮（青色系搭配） */
+        .btn-back {
+            flex-shrink: 0;
+            padding: 8px 18px;
+            border: 1px solid #4a6b5d;
+            background: rgba(240,247,242,0.9);
+            color: #273d33;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 13px;
+            white-space: nowrap;
+            transition: all 0.2s;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            z-index: 10;
+        }
+        .btn-back:hover {
+            background: #273d33;
+            color: #fff;
+        }
+
+        /* 双画布容器：自适应减去新顶栏高度 */
+        .canvas-viewport {
+            height: calc(88vh - 42px - 42px - 110px);
+            position: relative;
+            overflow: hidden;
+            background: #f7f9f6;
+        }
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        #mainCanvas {
+            z-index: 1;
+        }
+        #inkCanvas {
+            z-index: 2;
+        }
+    </style>
+</head>
+<body>
+<div class="app-wrap">
+    <!-- 底纹背景层 -->
+    <div class="texture-bg-layer" id="textureBg"></div>
+    
+    <!-- 主绘制界面 -->
+    <div class="draw-home">
+        <canvas id="drawCanvas"></canvas>
+        <button class="open-scroll-btn" id="openScroll">展开画轴 ✦ 选择底纹</button>
+    </div>
+
+    <!-- 卷轴弹窗页面 -->
+    <div class="scroll-wrapper" id="scrollBox">
+        <div class="scroll-rod-top"></div>
+        
+        <!-- 顶栏：绝对居中的底纹缩略图列表 -->
+        <div class="scroll-header">
+            <div class="scroll-title">选择底纹</div>
+            <div class="texture-select-area" id="textureList"></div>
+            <button class="btn-back" id="backDraw">收起画轴</button>
+        </div>
+
+        <!-- 绘画区域 -->
+        <div class="canvas-viewport">
+            <canvas id="mainCanvas"></canvas>
+            <canvas id="inkCanvas"></canvas>
+        </div>
+        
+        <div class="scroll-rod-bottom"></div>
+    </div>
+</div>
+
+<script>
+    const openScrollBtn = document.getElementById('openScroll');
+    const scrollBox = document.getElementById('scrollBox');
+    const backDrawBtn = document.getElementById('backDraw');
+    const textureListWrap = document.getElementById('textureList');
+    const drawCanvas = document.getElementById('drawCanvas');
+    const ctxDraw = drawCanvas.getContext('2d');
+    const textureBg = document.getElementById('textureBg');
+    const mainCanvas = document.getElementById('mainCanvas');
+    const inkCanvas = document.getElementById('inkCanvas');
+    const ctxMain = mainCanvas.getContext('2d');
+    const ctxInk = inkCanvas.getContext('2d');
+    
+    let currentTextureIndex = 1;
+    const totalTexture = 10;
+    const textureOpacity = 0.4;
+
+    // 生成10个底纹缩略项 westlake01~westlake10
+    for(let i=1; i<=totalTexture; i++){
+        const item = document.createElement('div');
+        item.className = "texture-item" + (i===1 ? " active":"");
+        item.dataset.idx = i;
+        item.style.backgroundImage = `url("./images/westlake${String(i).padStart(2,'0')}.jpg")`;
+        item.addEventListener('click', () => {
+            selectTexture(i);
+        });
+        textureListWrap.appendChild(item);
+    }
+
+    // 选中底纹
+    function selectTexture(idx){
+        currentTextureIndex = idx;
+        document.querySelectorAll('.texture-item').forEach(el => el.classList.remove('active'));
+        document.querySelector(`.texture-item[data-idx="${idx}"]`).classList.add('active');
+        textureBg.style.backgroundImage = `url("./images/westlake${String(idx).padStart(2,'0')}.jpg")`;
+        textureBg.style.opacity = textureOpacity;
+    }
+
+    // 同步所有画布尺寸
+    function syncAllCanvas(){
+        const wrap = document.querySelector('.app-wrap');
+        drawCanvas.width = wrap.clientWidth;
+        drawCanvas.height = wrap.clientHeight;
+
+        const viewport = document.querySelector('.canvas-viewport');
+        if (viewport) {
+            mainCanvas.width = viewport.clientWidth;
+            mainCanvas.height = viewport.clientHeight;
+            inkCanvas.width = viewport.clientWidth;
+            inkCanvas.height = viewport.clientHeight;
+        }
+    }
+
+    // 打开卷轴面板
+    openScrollBtn.addEventListener('click', () => {
+        scrollBox.classList.add('active');
+        setTimeout(syncAllCanvas, 100);
+    });
+
+    // 关闭卷轴返回绘制页
+    backDrawBtn.addEventListener('click', () => {
+        scrollBox.classList.remove('active');
+    });
+
+    window.addEventListener('resize', syncAllCanvas);
+    syncAllCanvas();
+    selectTexture(1);
+</script>
+</body>
+</html>
